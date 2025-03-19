@@ -1,0 +1,8 @@
+// Desenvolver programa em C que implemente uma função simples para escrever um texto na tela.
+
+#include <stdio.h>
+
+int main (void) {
+    printf ("hello world !\n");
+    return 0;
+}
