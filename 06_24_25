@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_CLIENTES 3000  // Suporte para até 3000 códigos
+
+int carregarCodigos(const char *nomeArquivo, int codigos[], int *total) {
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (!arquivo) {
+        printf("Erro ao abrir o arquivo!\n");
+        return 0;
+    }
+
+    *total = 0;
+    while (fscanf(arquivo, "%d", &codigos[*total]) == 1 && *total < MAX_CLIENTES) {
+        (*total)++;
+    }
+
+    fclose(arquivo);
+    return 1;
+}
+
+int buscaSequencial(int codigos[], int total, int codigoBusca) {
+    for (int i = 0; i < total; i++) {
+        if (codigos[i] == codigoBusca)
+            return i;
+    }
+    return -1;
+}
+
+int buscaSequencialOrdenada(int codigos[], int total, int codigoBusca) {
+    for (int i = 0; i < total; i++) {
+        if (codigos[i] == codigoBusca)
+            return i;
+        else if (codigos[i] > codigoBusca)
+            break;
+    }
+    return -1;
+}
+
+int buscaBinaria(int codigos[], int total, int codigoBusca) {
+    int inicio = 0, fim = total - 1;
+    while (inicio <= fim) {
+        int meio = (inicio + fim) / 2;
+        if (codigos[meio] == codigoBusca)
+            return meio;
+        else if (codigos[meio] < codigoBusca)
+            inicio = meio + 1;
+        else
+            fim = meio - 1;
+    }
+    return -1;
+}
+
+void ordenar(int codigos[], int total) {
+    for (int i = 0; i < total - 1; i++) {
+        for (int j = 0; j < total - i - 1; j++) {
+            if (codigos[j] > codigos[j + 1]) {
+                int temp = codigos[j];
+                codigos[j] = codigos[j + 1];
+                codigos[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int codigos[MAX_CLIENTES];
+    int total;
+
+    if (!carregarCodigos("clientes.csv", codigos, &total)) {
+        return 1;
+    }
+
+    printf("Total de códigos carregados: %d\n\n", total);
+
+    int codigoBusca;
+    printf("Digite o código a ser buscado: ");
+    scanf("%d", &codigoBusca);
+
+    int pos = buscaSequencial(codigos, total, codigoBusca);
+    if (pos != -1)
+        printf("Busca sequencial: Código %d encontrado na posição %d\n", codigoBusca, pos);
+    else
+        printf("Busca sequencial: Código %d não encontrado\n", codigoBusca);
+
+    ordenar(codigos, total);
+
+    pos = buscaSequencialOrdenada(codigos, total, codigoBusca);
+    if (pos != -1)
+        printf("Busca sequencial ordenada: Código %d encontrado na posição %d\n", codigoBusca, pos);
+    else
+        printf("Busca sequencial ordenada: Código %d não encontrado\n", codigoBusca);
+
+    pos = buscaBinaria(codigos, total, codigoBusca);
+    if (pos != -1)
+        printf("Busca binária: Código %d encontrado na posição %d\n", codigoBusca, pos);
+    else
+        printf("Busca binária: Código %d não encontrado\n", codigoBusca);
+
+    return 0;
+}
